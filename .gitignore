@@ -80,3 +80,6 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+
+# api key resource file
+app/src/main/res/values/api_key.xml
