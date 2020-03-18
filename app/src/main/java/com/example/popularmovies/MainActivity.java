@@ -18,6 +18,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
+    private MovieAdapter mMovieAdapter;
+
+    private List<Movie> movieData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,10 +30,14 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_movies);
 
         GridLayoutManager layoutManager
-                = new GridLayoutManager(this, GridLayoutManager.DEFAULT_SPAN_COUNT);
+                = new GridLayoutManager(this, 3);
 
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
+
+        mMovieAdapter = new MovieAdapter();
+
+        mRecyclerView.setAdapter(mMovieAdapter);
 
         new FetchMovieTask().execute();
     }
@@ -51,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("JSON RESPONSE:", jsonMovieResponse);
 
                 // Parse JSON into a list of movies...
-                List<Movie> movies = MovieDBJsonUtils
+                movieData = MovieDBJsonUtils
                         .getMoviesFromJson(jsonMovieResponse);
 
             } catch (Exception e){
@@ -60,6 +67,13 @@ public class MainActivity extends AppCompatActivity {
             }
 
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(String[] strings) {
+            if (movieData != null){
+                mMovieAdapter.setMovieData(movieData);
+            }
         }
     }
 }
