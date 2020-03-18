@@ -14,4 +14,8 @@ public class Movie {
         this.vote_average = vote_avg;
         this.plot = plot;
     }
+
+    public String getPoster() {
+        return poster;
+    }
 }
