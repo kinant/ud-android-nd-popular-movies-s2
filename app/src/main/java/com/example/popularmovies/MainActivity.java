@@ -1,6 +1,8 @@
 package com.example.popularmovies;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,21 +12,25 @@ import com.example.popularmovies.model.Movie;
 import com.example.popularmovies.utilities.MovieDBJsonUtils;
 import com.example.popularmovies.utilities.NetworkUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
-import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity {
+
+    private RecyclerView mRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_movies);
 
+        GridLayoutManager layoutManager
+                = new GridLayoutManager(this, GridLayoutManager.DEFAULT_SPAN_COUNT);
+
+        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setHasFixedSize(true);
 
         new FetchMovieTask().execute();
     }
