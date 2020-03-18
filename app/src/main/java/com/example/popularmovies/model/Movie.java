@@ -4,10 +4,10 @@ public class Movie {
     private String title;
     private String releaseDate;
     private String poster;
-    private String vote_average;
+    private int vote_average;
     private String plot;
 
-    public Movie(String title, String releaseDate, String poster, String vote_avg, String plot){
+    public Movie(String title, String releaseDate, String poster, int vote_avg, String plot){
         this.title = title;
         this.releaseDate = releaseDate;
         this.poster = poster;
