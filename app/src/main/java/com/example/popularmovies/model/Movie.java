@@ -15,6 +15,10 @@ public class Movie {
         this.plot = plot;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
     public String getPoster() {
         return poster;
     }

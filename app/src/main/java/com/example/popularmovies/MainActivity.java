@@ -4,9 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.popularmovies.model.Movie;
 import com.example.popularmovies.utilities.MovieDBJsonUtils;
@@ -15,7 +17,7 @@ import com.example.popularmovies.utilities.NetworkUtils;
 import java.net.URL;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler {
 
     private RecyclerView mRecyclerView;
     private MovieAdapter mMovieAdapter;
@@ -35,11 +37,17 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
 
-        mMovieAdapter = new MovieAdapter();
+        mMovieAdapter = new MovieAdapter(this);
 
         mRecyclerView.setAdapter(mMovieAdapter);
 
         new FetchMovieTask().execute();
+    }
+
+    @Override
+    public void onClick(Movie movie) {
+        Context context = getApplicationContext();
+        Toast.makeText(context, movie.getTitle(), Toast.LENGTH_SHORT).show();
     }
 
     public class FetchMovieTask extends AsyncTask<String, Void, String[]> {

@@ -6,8 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.view.View.OnClickListener;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.popularmovies.model.Movie;
@@ -20,12 +20,30 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
     private List<Movie> mMovieData;
 
-    public class MovieAdapterViewHolder extends RecyclerView.ViewHolder {
+    private final MovieAdapterOnClickHandler mClickHandler;
+
+    public interface MovieAdapterOnClickHandler {
+        void onClick(Movie movie);
+    }
+
+    public MovieAdapter(MovieAdapterOnClickHandler clickHandler){
+        mClickHandler = clickHandler;
+    }
+
+    public class MovieAdapterViewHolder extends RecyclerView.ViewHolder implements OnClickListener {
         public final ImageView mMoviePoster;
 
         public MovieAdapterViewHolder(View view){
             super(view);
             mMoviePoster = (ImageView) view.findViewById(R.id.image_iv);
+            view.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            int adapterPosition = getAdapterPosition();
+            Movie movieToView = mMovieData.get(adapterPosition);
+            mClickHandler.onClick(movieToView);
         }
     }
 
@@ -45,6 +63,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     public void onBindViewHolder(MovieAdapterViewHolder movieAdapterViewHolder, int position) {
         // Set the image
 
+        // https://guides.codepath.com/android/Displaying-Images-with-the-Picasso-Library
         Picasso.get()
                 .load(mMovieData.get(position).getPoster())
                 .into(movieAdapterViewHolder.mMoviePoster);
