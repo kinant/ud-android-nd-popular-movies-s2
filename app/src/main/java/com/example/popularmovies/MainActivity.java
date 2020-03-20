@@ -10,6 +10,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.popularmovies.model.Movie;
@@ -51,6 +54,29 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         Intent intent = new Intent(this, MovieDetailActivity.class);
         intent.putExtra(MovieDetailActivity.MOVIE, movie);
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if(id == R.id.action_most_popular){
+            // load most popular
+        }
+
+        if(id == R.id.action_highest_rated){
+            // load highest rated
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
