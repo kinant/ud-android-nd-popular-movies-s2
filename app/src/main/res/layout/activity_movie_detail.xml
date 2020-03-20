@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:adjustViewBounds="true"
-        android:contentDescription="Movie Poster"
+        android:contentDescription="@string/poster_content"
         android:scaleType="centerCrop" />
 
     <ScrollView
@@ -28,7 +28,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Title: "
+                android:text="@string/title"
                 android:textStyle="bold"
                 android:textAllCaps="true"
                 android:layout_marginTop="15sp"
@@ -42,7 +42,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Release Date: "
+                android:text="@string/date"
                 android:textStyle="bold"
                 android:textAllCaps="true"
                 android:layout_marginTop="15sp"
@@ -56,7 +56,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Voter Average: "
+                android:text="@string/vote_avg"
                 android:textStyle="bold"
                 android:textAllCaps="true"
                 android:layout_marginTop="15sp"
@@ -70,7 +70,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Plot Overivew: "
+                android:text="@string/plot"
                 android:textStyle="bold"
                 android:textAllCaps="true"
                 android:layout_marginTop="15sp"

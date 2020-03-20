@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">Popular Movies</string>
+
+    <!-- Used by MainActivity Layout -->
+    <string name="error_message">Could not fetch movies! Check internet connection!</string>
+
+    <!-- Used by Movie Grid Item Layout -->
+    <string name="poster_content">Movie Poster</string>
+
+    <!-- Used by Movie Detail Component Layout -->
+    <string name="title">Title:</string>
+    <string name="date">Release Date:</string>
+    <string name="vote_avg">Voter Average:</string>
+    <string name="plot">Plot Overview:</string>
+
 </resources>

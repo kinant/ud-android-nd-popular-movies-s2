@@ -84,6 +84,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mNoInternet.setVisibility(View.VISIBLE);
     }
 
+    private void hideErrorMessage(){
+        mNoInternet.setVisibility(View.GONE);
+    }
+
     @Override
     public void onClick(Movie movie) {
         Intent intent = new Intent(this, MovieDetailActivity.class);
@@ -122,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         protected void onPreExecute() {
             super.onPreExecute();
             hideGrid();
+            hideErrorMessage();
             mLoadingIndicator.setVisibility(View.VISIBLE);
         }
 

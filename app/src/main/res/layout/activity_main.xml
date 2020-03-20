@@ -12,7 +12,7 @@
         android:id="@+id/no_internet_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Could not fetch movies! Check internet connection!"
+        android:text="@string/error_message"
         android:textSize="20sp"
         android:textStyle="bold"
         android:visibility="invisible"/>
