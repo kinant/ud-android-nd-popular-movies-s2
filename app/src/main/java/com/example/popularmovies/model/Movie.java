@@ -20,13 +20,17 @@ public class Movie implements Parcelable {
         this.plot = plot;
     }
 
-    public String getTitle() {
-        return title;
-    }
+    public String getTitle() { return title; }
 
     public String getPoster() {
         return poster;
     }
+
+    public String getReleaseDate() { return releaseDate; }
+
+    public String getPlot() { return plot; }
+
+    public int getVote_average() { return vote_average; }
 
     public Movie(Parcel in){
         readFromParcel( in );
