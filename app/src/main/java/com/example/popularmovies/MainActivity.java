@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import com.example.popularmovies.model.Movie;
 import com.example.popularmovies.utilities.MovieDBJsonUtils;
@@ -24,9 +26,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private RecyclerView mRecyclerView;
     private MovieAdapter mMovieAdapter;
 
-    private List<Movie> movieData;
+    private TextView mNoInternet;
 
-    private boolean isConnectedToInternet = false;
+    private List<Movie> movieData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +36,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         setContentView(R.layout.activity_main);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_movies);
+
+        mNoInternet = (TextView) findViewById(R.id.no_internet_tv);
 
         GridLayoutManager layoutManager
                 = new GridLayoutManager(this, 3);
@@ -51,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private void loadMovies(NetworkUtils.Endpoint endpoint){
 
-        new CheckNetworkTask().execute(endpoint);
+        new FetchMovieTask().execute(endpoint);
 
         if(endpoint == NetworkUtils.Endpoint.POPULAR){
             setTitle("Most Popular Movies");
@@ -60,6 +64,16 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         if(endpoint == NetworkUtils.Endpoint.TOP_RATED){
             setTitle("Highest Rated Movies");
         }
+    }
+
+    private void showGrid(){
+        mRecyclerView.setVisibility(View.VISIBLE);
+        mNoInternet.setVisibility(View.GONE);
+    }
+
+    private void hideGrid(){
+        mRecyclerView.setVisibility(View.GONE);
+        mNoInternet.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -99,25 +113,30 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         @Override
         protected Void doInBackground(NetworkUtils.Endpoint... endpoints) {
 
-            NetworkUtils.Endpoint endpointSelected = endpoints[0];
+            if(NetworkUtils.isOnline()) {
 
-            URL moviesRequestUrl = NetworkUtils
-                    .buildURL(endpointSelected, getString(R.string.api_key));
+                NetworkUtils.Endpoint endpointSelected = endpoints[0];
 
-            try {
+                URL moviesRequestUrl = NetworkUtils
+                        .buildURL(endpointSelected, getString(R.string.api_key));
 
-                String jsonMovieResponse = NetworkUtils
-                        .getResponseFromHttpUrl(moviesRequestUrl);
+                try {
 
-                Log.d("JSON RESPONSE:", jsonMovieResponse);
+                    String jsonMovieResponse = NetworkUtils
+                            .getResponseFromHttpUrl(moviesRequestUrl);
 
-                // Parse JSON into a list of movies...
-                movieData = MovieDBJsonUtils
-                        .getMoviesFromJson(jsonMovieResponse);
+                    Log.d("JSON RESPONSE:", jsonMovieResponse);
 
-            } catch (Exception e){
-                e.printStackTrace();
-                return null;
+                    // Parse JSON into a list of movies...
+                    movieData = MovieDBJsonUtils
+                            .getMoviesFromJson(jsonMovieResponse);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            } else {
+                movieData = null;
             }
 
             return null;
@@ -127,25 +146,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         protected void onPostExecute(Void aVoid) {
             if (movieData != null){
                 mMovieAdapter.setMovieData(movieData);
-            }
-        }
-    }
-
-    public class CheckNetworkTask extends  AsyncTask<NetworkUtils.Endpoint, Void, Void>{
-
-        @Override
-        protected Void doInBackground(NetworkUtils.Endpoint... endpoints) {
-            NetworkUtils.Endpoint endpoint = endpoints[0];
-
-            if(NetworkUtils.isOnline()){
-                Log.d("NETWORK: ", "CONNECTED TO NETWORK!");
-                new FetchMovieTask().execute(endpoint);
+                showGrid();
             } else {
-                Log.d("NETWORK: ", "NO NETWORK CONNECTION!");
+                hideGrid();
             }
-
-            return null;
         }
-
     }
 }
