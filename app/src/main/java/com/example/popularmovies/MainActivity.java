@@ -4,16 +4,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.example.popularmovies.model.Movie;
 import com.example.popularmovies.utilities.MovieDBJsonUtils;
@@ -46,7 +43,21 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         mRecyclerView.setAdapter(mMovieAdapter);
 
-        new FetchMovieTask().execute();
+        // load default endopoint movie grid (most popular movies)
+        new FetchMovieTask().execute("");
+    }
+
+    private void loadMovies(NetworkUtils.Endpoint endpoint){
+
+        if(endpoint == NetworkUtils.Endpoint.POPULAR){
+            setTitle("Most Popular Movies");
+            new FetchMovieTask().execute("popular");
+        }
+
+        if(endpoint == NetworkUtils.Endpoint.TOP_RATED){
+            setTitle("Highest Rated Movies");
+            new FetchMovieTask().execute("highest_rated");
+        }
     }
 
     @Override
@@ -70,10 +81,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         if(id == R.id.action_most_popular){
             // load most popular
+            loadMovies(NetworkUtils.Endpoint.POPULAR);
         }
 
         if(id == R.id.action_highest_rated){
             // load highest rated
+            loadMovies(NetworkUtils.Endpoint.TOP_RATED);
         }
 
         return super.onOptionsItemSelected(item);
@@ -84,8 +97,17 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         @Override
         protected String[] doInBackground(String... params) {
 
+            String endpointString = params[0];
+            NetworkUtils.Endpoint endpointSelected = NetworkUtils.Endpoint.POPULAR;
+
+            if(endpointString == "popular"){
+                endpointSelected = NetworkUtils.Endpoint.POPULAR;
+            } else if(endpointString == "highest_rated"){
+                endpointSelected = NetworkUtils.Endpoint.TOP_RATED;
+            }
+
             URL moviesRequestUrl = NetworkUtils
-                    .buildURL(NetworkUtils.Endpoint.POPULAR, getString(R.string.api_key));
+                    .buildURL(endpointSelected, getString(R.string.api_key));
 
             try {
 
