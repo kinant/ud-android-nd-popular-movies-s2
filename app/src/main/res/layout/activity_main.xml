@@ -17,4 +17,11 @@
         android:textStyle="bold"
         android:visibility="invisible"/>
 
+    <ProgressBar
+        android:id="@+id/pb_loading_indicator"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:visibility="invisible"/>
+
 </FrameLayout>

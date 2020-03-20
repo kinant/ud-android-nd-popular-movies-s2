@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.popularmovies.model.Movie;
@@ -28,6 +29,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private TextView mNoInternet;
 
+    private ProgressBar mLoadingIndicator;
+
     private List<Movie> movieData;
 
     @Override
@@ -38,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_movies);
 
         mNoInternet = (TextView) findViewById(R.id.no_internet_tv);
+
+        mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
 
         GridLayoutManager layoutManager
                 = new GridLayoutManager(this, 3);
@@ -68,10 +73,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private void showGrid(){
         mRecyclerView.setVisibility(View.VISIBLE);
-        mNoInternet.setVisibility(View.GONE);
     }
 
     private void hideGrid(){
+        mRecyclerView.setVisibility(View.GONE);
+    }
+
+    private void showErrorMessage(){
         mRecyclerView.setVisibility(View.GONE);
         mNoInternet.setVisibility(View.VISIBLE);
     }
@@ -111,6 +119,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     public class FetchMovieTask extends AsyncTask<NetworkUtils.Endpoint, Void, Void> {
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            hideGrid();
+            mLoadingIndicator.setVisibility(View.VISIBLE);
+        }
+
+        @Override
         protected Void doInBackground(NetworkUtils.Endpoint... endpoints) {
 
             if(NetworkUtils.isOnline()) {
@@ -144,11 +159,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         @Override
         protected void onPostExecute(Void aVoid) {
+
+            mLoadingIndicator.setVisibility(View.GONE);
+
             if (movieData != null){
                 mMovieAdapter.setMovieData(movieData);
                 showGrid();
             } else {
-                hideGrid();
+                showErrorMessage();
             }
         }
     }
