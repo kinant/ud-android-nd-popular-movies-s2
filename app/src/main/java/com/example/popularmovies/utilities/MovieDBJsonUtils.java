@@ -1,7 +1,5 @@
 package com.example.popularmovies.utilities;
 
-import android.util.Log;
-
 import com.example.popularmovies.model.Movie;
 
 import org.json.JSONArray;
@@ -41,8 +39,6 @@ public final class MovieDBJsonUtils {
                 String poster = "http://image.tmdb.org/t/p/w185/" + result.getString(MDB_POSTER);
                 int vote_avg = result.getInt(MDB_VOTE_AVG);
                 String plot = result.getString(MDB_PLOT);
-
-                Log.d("Movie" + i + "", title + ", " + releaseDate + ", " + poster + ", " + String.valueOf(vote_avg) + ", " + plot);
 
                 Movie newMovie = new Movie(
                         title,
