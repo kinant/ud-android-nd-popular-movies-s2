@@ -26,6 +26,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private List<Movie> movieData;
 
+    private boolean isConnectedToInternet = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,19 +46,19 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mRecyclerView.setAdapter(mMovieAdapter);
 
         // load default endopoint movie grid (most popular movies)
-        new FetchMovieTask().execute("");
+        loadMovies(NetworkUtils.Endpoint.POPULAR);
     }
 
     private void loadMovies(NetworkUtils.Endpoint endpoint){
 
+        new CheckNetworkTask().execute(endpoint);
+
         if(endpoint == NetworkUtils.Endpoint.POPULAR){
             setTitle("Most Popular Movies");
-            new FetchMovieTask().execute("popular");
         }
 
         if(endpoint == NetworkUtils.Endpoint.TOP_RATED){
             setTitle("Highest Rated Movies");
-            new FetchMovieTask().execute("highest_rated");
         }
     }
 
@@ -92,19 +94,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         return super.onOptionsItemSelected(item);
     }
 
-    public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
+    public class FetchMovieTask extends AsyncTask<NetworkUtils.Endpoint, Void, Void> {
 
         @Override
-        protected String[] doInBackground(String... params) {
+        protected Void doInBackground(NetworkUtils.Endpoint... endpoints) {
 
-            String endpointString = params[0];
-            NetworkUtils.Endpoint endpointSelected = NetworkUtils.Endpoint.POPULAR;
-
-            if(endpointString == "popular"){
-                endpointSelected = NetworkUtils.Endpoint.POPULAR;
-            } else if(endpointString == "highest_rated"){
-                endpointSelected = NetworkUtils.Endpoint.TOP_RATED;
-            }
+            NetworkUtils.Endpoint endpointSelected = endpoints[0];
 
             URL moviesRequestUrl = NetworkUtils
                     .buildURL(endpointSelected, getString(R.string.api_key));
@@ -129,10 +124,28 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         }
 
         @Override
-        protected void onPostExecute(String[] strings) {
+        protected void onPostExecute(Void aVoid) {
             if (movieData != null){
                 mMovieAdapter.setMovieData(movieData);
             }
         }
+    }
+
+    public class CheckNetworkTask extends  AsyncTask<NetworkUtils.Endpoint, Void, Void>{
+
+        @Override
+        protected Void doInBackground(NetworkUtils.Endpoint... endpoints) {
+            NetworkUtils.Endpoint endpoint = endpoints[0];
+
+            if(NetworkUtils.isOnline()){
+                Log.d("NETWORK: ", "CONNECTED TO NETWORK!");
+                new FetchMovieTask().execute(endpoint);
+            } else {
+                Log.d("NETWORK: ", "NO NETWORK CONNECTION!");
+            }
+
+            return null;
+        }
+
     }
 }
