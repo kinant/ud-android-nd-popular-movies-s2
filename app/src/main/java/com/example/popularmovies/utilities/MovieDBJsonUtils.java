@@ -18,8 +18,13 @@ public final class MovieDBJsonUtils {
     final static String MDB_VOTE_AVG = "vote_average";
     final static String MDB_PLOT = "overview";
 
+    /** This method is used to convert a string from a JSONObject
+     * into a list of movies
+     * @param jsonString the json string result from the API Request
+     */
     public static List<Movie> getMoviesFromJson(String jsonString){
 
+        // initialize the list of movies
         List<Movie> movies = new ArrayList<Movie>();
 
         try {
@@ -36,10 +41,13 @@ public final class MovieDBJsonUtils {
                 // get the data
                 String title = result.getString(MDB_TITLE);
                 String releaseDate = result.getString(MDB_RELEASE_DATE);
+
+                // create the full string for a poster url
                 String poster = "http://image.tmdb.org/t/p/w185/" + result.getString(MDB_POSTER);
                 int vote_avg = result.getInt(MDB_VOTE_AVG);
                 String plot = result.getString(MDB_PLOT);
 
+                // create a new movie
                 Movie newMovie = new Movie(
                         title,
                         releaseDate,
@@ -47,6 +55,7 @@ public final class MovieDBJsonUtils {
                         vote_avg,
                         plot);
 
+                // add it to the list
                 movies.add(newMovie);
             }
 

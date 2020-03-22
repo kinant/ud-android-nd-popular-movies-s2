@@ -3,8 +3,13 @@ package com.example.popularmovies.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-// https://stackoverflow.com/questions/2736389/how-to-pass-an-object-from-one-activity-to-another-on-android
-// http://sohailaziz05.blogspot.com/2012/04/passing-custom-objects-between-android.html
+/**
+ * This class is used to represent a Movie Object. It implements Parcelable, so that it can
+ * be passed from one activity to another. For more information and reference on the code, look at
+ * the following sources:
+ * https://stackoverflow.com/questions/2736389/how-to-pass-an-object-from-one-activity-to-another-on-android
+ * http://sohailaziz05.blogspot.com/2012/04/passing-custom-objects-between-android.html
+ */
 public class Movie implements Parcelable {
     private String title;
     private String releaseDate;

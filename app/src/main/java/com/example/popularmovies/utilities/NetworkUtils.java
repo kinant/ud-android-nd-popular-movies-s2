@@ -14,8 +14,6 @@ import java.util.Scanner;
 
 public final class NetworkUtils {
 
-    private static final String TAG = NetworkUtils.class.getSimpleName();
-
     private static final String MOVIES_DB_URL = "http://api.themoviedb.org/3/movie/";
 
     final static String most_popular = "popular";
@@ -27,11 +25,20 @@ public final class NetworkUtils {
         POPULAR,
         TOP_RATED
     }
-
+    /**
+     * Builds the URL used to talk to the weather server using a location. This location is based
+     * on the query capabilities of the weather provider that we are using.
+     *
+     * @param endpoint The endpoint that will be used as part of the url
+     * @param api_key The user's api key to be used as a query parameter (to have access to the data)
+     * @return The URL to use to query the API server.
+     */
     public static URL buildURL(Endpoint endpoint, String api_key){
 
+        // we will build the url from the base url
         String base_url = MOVIES_DB_URL;
 
+        // add the endpoint to the base url
         if(endpoint == Endpoint.POPULAR){
             base_url += most_popular;
         } else if (endpoint == Endpoint.TOP_RATED){
@@ -52,7 +59,13 @@ public final class NetworkUtils {
 
         return url;
     }
-
+    /**
+     * This method returns the entire result from the HTTP response.
+     *
+     * @param url The URL to fetch the HTTP response from.
+     * @return The contents of the HTTP response.
+     * @throws IOException Related to network and stream reading
+     */
     public static String getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         try {
@@ -72,7 +85,11 @@ public final class NetworkUtils {
         }
     }
 
-    // https://stackoverflow.com/questions/1560788/how-to-check-internet-access-on-android-inetaddress-never-times-out
+    /**
+     * This method checks if the network is online (if phone has internet access)
+     * Uses code from: https://stackoverflow.com/questions/1560788/how-to-check-internet-access-on-android-inetaddress-never-times-out
+     * @return returns true or false depending on if there is access to the internet or not
+     */
     public static boolean isOnline() {
         try {
             int timeoutMs = 1500;
