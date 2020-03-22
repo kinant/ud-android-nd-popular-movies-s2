@@ -107,7 +107,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
      */
     @Override
     public void onBindViewHolder(MovieAdapterViewHolder movieAdapterViewHolder, int position) {
-        /** Set the image using Picasso:
+        /* Set the image using Picasso:
         * Using code from: https://guides.codepath.com/android/Displaying-Images-with-the-Picasso-Library
         */
         Picasso.get()

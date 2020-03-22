@@ -37,7 +37,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Movie movie = (Movie) intent.getParcelableExtra(MOVIE);
 
-        // Set the image
+        // Set the image using Picasso
         // https://guides.codepath.com/android/Displaying-Images-with-the-Picasso-Library
         Picasso.get()
                 .load(movie.getPoster())

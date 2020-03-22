@@ -37,30 +37,45 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Get references
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_movies);
 
         mNoInternet = (TextView) findViewById(R.id.no_internet_tv);
 
         mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
 
+        // create the GridLayoutManager with a spanCount of 3 (to show 3 columns)
         GridLayoutManager layoutManager
                 = new GridLayoutManager(this, 3);
 
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
 
+        /*
+         * The MovieAdapter is responsible for linking our movie data with the Views that
+         * will end up displaying the movie data.
+         */
         mMovieAdapter = new MovieAdapter(this);
 
+        /* Setting the adapter attaches it to the RecyclerView in our layout. */
         mRecyclerView.setAdapter(mMovieAdapter);
 
         // load default endopoint movie grid (most popular movies)
         loadMovies(NetworkUtils.Endpoint.POPULAR);
     }
 
+    /**
+     * This method is used to load the movies based on the endpoint the user
+     * has selected
+     *
+     * @param endpoint  the endpoint selected by the user
+     */
     private void loadMovies(NetworkUtils.Endpoint endpoint){
 
+        // execute the FetchMovieTask Async task, passing along the endpoing
         new FetchMovieTask().execute(endpoint);
 
+        // set the title for the UI
         if(endpoint == NetworkUtils.Endpoint.POPULAR){
             setTitle("Most Popular Movies");
         }
@@ -70,42 +85,80 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         }
     }
 
+    /**
+     * This method is used to show the grid (once movies are successfully loaded)
+     */
     private void showGrid(){
         mRecyclerView.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * This method is used to hide the grid, for instance, when the user
+     * selects another endpoint and the movies are refreshed or if
+     * there is a network error and the movies are not loaded.
+     */
     private void hideGrid(){
         mRecyclerView.setVisibility(View.GONE);
     }
 
+    /**
+     * This method is used to show the error message and hide the grid
+     */
     private void showErrorMessage(){
-        mRecyclerView.setVisibility(View.GONE);
+        hideGrid();
         mNoInternet.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * This method is used to hide the error message
+     */
     private void hideErrorMessage(){
         mNoInternet.setVisibility(View.GONE);
     }
 
+    /**
+     * This method is overridden by our MainActivity class in order to handle RecyclerView item
+     * clicks. Will start an activity to show the detail view of the movie that was clicked.
+     *
+     * @param movie The movie that was clicked (poster is clicked but we pass along the whole movie
+     *              object.
+     */
     @Override
     public void onClick(Movie movie) {
+
+        // create the intent to show the MovieDetailActivity
         Intent intent = new Intent(this, MovieDetailActivity.class);
+
+        // pass along the movie as an extra (the Movie object is parelable, so we are able to do this)
         intent.putExtra(MovieDetailActivity.MOVIE, movie);
+
+        // start the MovieDetailActivity
         startActivity(intent);
     }
 
+    /** This method is used to show the options/settings menu so the user
+     * Can select between most popular and highest rated movies
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // Use AppCompactActivity's method getMenuInflater to get a handle of the menu inflater
         MenuInflater inflater = getMenuInflater();
+
+        // use the inflater's inflate method to inflate our menu to this menu
         inflater.inflate(R.menu.main_menu, menu);
 
         return true;
     }
 
+    /** This method handles the selection of a menu item
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        /* Check which menu item was selected and load the movies for the
+            appropriate endpoint
+         */
         if(id == R.id.action_most_popular){
             // load most popular
             loadMovies(NetworkUtils.Endpoint.POPULAR);
@@ -119,11 +172,16 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         return super.onOptionsItemSelected(item);
     }
 
+    /** Async Task that is used for checking the network status and then loading the
+     * movies from the API.
+     */
     public class FetchMovieTask extends AsyncTask<NetworkUtils.Endpoint, Void, Void> {
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+
+            // we hide the grid and error and show the progress indicator
             hideGrid();
             hideErrorMessage();
             mLoadingIndicator.setVisibility(View.VISIBLE);
@@ -132,15 +190,19 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         @Override
         protected Void doInBackground(NetworkUtils.Endpoint... endpoints) {
 
+            // first we check if the network is online
             if(NetworkUtils.isOnline()) {
 
+                // if the network is online, then we proceed to get the endpoint
                 NetworkUtils.Endpoint endpointSelected = endpoints[0];
 
+                // build the url
                 URL moviesRequestUrl = NetworkUtils
                         .buildURL(endpointSelected, getString(R.string.api_key));
 
                 try {
 
+                    // get the JSON results from the network (The Movie Database API)
                     String jsonMovieResponse = NetworkUtils
                             .getResponseFromHttpUrl(moviesRequestUrl);
 
@@ -162,8 +224,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         @Override
         protected void onPostExecute(Void aVoid) {
 
+            // hide the progress indicator
             mLoadingIndicator.setVisibility(View.GONE);
 
+            // check that we have movie data and set them in the adapter and then show the grid
             if (movieData != null){
                 mMovieAdapter.setMovieData(movieData);
                 showGrid();
