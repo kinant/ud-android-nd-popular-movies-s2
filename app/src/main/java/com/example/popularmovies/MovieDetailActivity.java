@@ -4,19 +4,20 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.popularmovies.database.AppDatabase;
-import com.example.popularmovies.database.FavoriteMovie;
 import com.example.popularmovies.model.Movie;
 import com.example.popularmovies.utilities.AppExecutors;
+import com.example.popularmovies.utilities.ImageSaver;
 import com.squareup.picasso.Picasso;
 
 public class MovieDetailActivity extends AppCompatActivity {
@@ -72,8 +73,6 @@ public class MovieDetailActivity extends AppCompatActivity {
         mVoterAvg.setText(String.valueOf(mMovie.getVote_average()));
         mPlot.setText(mMovie.getPlot());
 
-        Log.d("VIEWING MOVIE: ", "id = " + mMovie.getMovie_id());
-
         // Database
         mDb = AppDatabase.getInstance(this);
 
@@ -89,8 +88,6 @@ public class MovieDetailActivity extends AppCompatActivity {
             @Override
             public void run() {
                 int isFavoriteInt = mDb.favoriteMovieDao().isMovieFavorite(mMovie.getMovie_id());
-
-                Log.d("FAVORITE: ", "Is favorite int: " + isFavoriteInt);
 
                 isFavorite = (isFavoriteInt == 1) ? true : false;
                 isFavoriteDB = isFavorite;
@@ -113,27 +110,27 @@ public class MovieDetailActivity extends AppCompatActivity {
 
     public void toggleFavorite(View view) {
         isFavorite = !isFavorite;
-        Log.d("FAVORITE: ", "toggling favorite!" + isFavorite);
         changeFavoriteIconColor();
     }
 
     // Use the on destroy activity lifecycle event to save or delete if a movie is favorited
     @Override
     protected void onDestroy() {
-        // super.onDestroy();
-        Log.d("DETAIL: ", "ON DESTROY!!");
 
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
                 if(isFavorite && !isFavoriteDB){
-                    Log.d("DB: ", "Saving movie to DB");
-                    int id = mMovie.getMovie_id();
-                    FavoriteMovie movie = new FavoriteMovie(id);
-                    Log.d("DB FAV MOVIE: ", "id = " + movie.getMovie_id() + "should be: " + id);
-                    mDb.favoriteMovieDao().insertFavoriteMovie(movie);
+
+                    Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.id.d_poster_iv);
+
+                    new ImageSaver(getApplicationContext())
+                            .setFileName(mMovie.getMovie_id() + ".png")
+                            .setDirectoryName("favorite_movies")
+                            .save(bitmap);
+
+                    mDb.favoriteMovieDao().insertFavoriteMovie(mMovie);
                 } else if(isFavoriteDB && !isFavorite) {
-                    Log.d("DB: ", "Deleting movie from DB");
                     mDb.favoriteMovieDao().deleteFavoriteMovie(mMovie.getMovie_id());
                 }
             }

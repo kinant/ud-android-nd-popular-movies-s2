@@ -16,7 +16,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.popularmovies.database.AppDatabase;
-import com.example.popularmovies.database.FavoriteMovie;
 import com.example.popularmovies.model.Movie;
 import com.example.popularmovies.utilities.AppExecutors;
 import com.example.popularmovies.utilities.MovieDBJsonUtils;
@@ -79,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                List<FavoriteMovie> favoriteMovies = mDb.favoriteMovieDao().loadAllFavoriteMovies();
+                List<Movie> favoriteMovies = mDb.favoriteMovieDao().loadAllFavoriteMovies();
                 Log.d("LOADING FAVORITES: ", "size is " + favoriteMovies.size());
 
                 for(int i = 0; i < favoriteMovies.size(); i++){
