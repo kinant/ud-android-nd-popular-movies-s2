@@ -12,6 +12,7 @@ import java.util.List;
 public final class MovieDBJsonUtils {
 
     final static String MDB_RESULTS = "results";
+    final static String MDB_MOVIE_ID = "id";
     final static String MDB_TITLE = "original_title";
     final static String MDB_RELEASE_DATE = "release_date";
     final static String MDB_POSTER = "poster_path";
@@ -39,6 +40,7 @@ public final class MovieDBJsonUtils {
                 // create a new movie
                 JSONObject result = results.getJSONObject(i);
                 // get the data
+                int id = result.getInt(MDB_MOVIE_ID);
                 String title = result.getString(MDB_TITLE);
                 String releaseDate = result.getString(MDB_RELEASE_DATE);
 
@@ -49,6 +51,7 @@ public final class MovieDBJsonUtils {
 
                 // create a new movie
                 Movie newMovie = new Movie(
+                        id,
                         title,
                         releaseDate,
                         poster,

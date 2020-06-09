@@ -13,7 +13,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.popularmovies.database.AppDatabase;
+import com.example.popularmovies.database.FavoriteMovie;
 import com.example.popularmovies.model.Movie;
+import com.example.popularmovies.utilities.AppExecutors;
 import com.squareup.picasso.Picasso;
 
 public class MovieDetailActivity extends AppCompatActivity {
@@ -29,7 +32,12 @@ public class MovieDetailActivity extends AppCompatActivity {
     private ImageView mFavoriteIcon;
     private Drawable mDrawable;
 
+    private AppDatabase mDb;
+
+    private Movie mMovie;
+
     private boolean isFavorite = false;
+    private boolean isFavoriteDB = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,34 +52,54 @@ public class MovieDetailActivity extends AppCompatActivity {
         mPoster = (ImageView) findViewById(R.id.d_poster_iv);
         mFavoriteIcon = (ImageView) findViewById(R.id.iv_favorite);
 
+        // get drawable for favorite icon
+        // https://www.semicolonworld.com/question/45887/change-drawable-color-programmatically
+        mDrawable = ContextCompat.getDrawable(this,R.drawable.ic_heart);
+
         // Get the movie
         Intent intent = getIntent();
-        Movie movie = (Movie) intent.getParcelableExtra(MOVIE);
+        mMovie = (Movie) intent.getParcelableExtra(MOVIE);
 
         // Set the image using Picasso
         // https://guides.codepath.com/android/Displaying-Images-with-the-Picasso-Library
         Picasso.get()
-                .load(movie.getPoster())
+                .load(mMovie.getPoster())
                 .into(mPoster);
 
         // Set the text views
-        mTitle.setText(movie.getTitle());
-        mReleaseDate.setText(movie.getReleaseDate());
-        mVoterAvg.setText(String.valueOf(movie.getVote_average()));
-        mPlot.setText(movie.getPlot());
+        mTitle.setText(mMovie.getTitle());
+        mReleaseDate.setText(mMovie.getReleaseDate());
+        mVoterAvg.setText(String.valueOf(mMovie.getVote_average()));
+        mPlot.setText(mMovie.getPlot());
+
+        Log.d("VIEWING MOVIE: ", "id = " + mMovie.getMovie_id());
+
+        // Database
+        mDb = AppDatabase.getInstance(this);
 
         // set the title
-        setTitle(movie.getTitle());
+        setTitle(mMovie.getTitle());
 
         // check if movie is favorite
         checkIsFavorite();
-        // https://www.semicolonworld.com/question/45887/change-drawable-color-programmatically
-        mDrawable = ContextCompat.getDrawable(this,R.drawable.ic_heart);
     }
 
-
-
     private void checkIsFavorite() {
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                int isFavoriteInt = mDb.favoriteMovieDao().isMovieFavorite(mMovie.getMovie_id());
+
+                Log.d("FAVORITE: ", "Is favorite int: " + isFavoriteInt);
+
+                isFavorite = (isFavoriteInt == 1) ? true : false;
+                isFavoriteDB = isFavorite;
+                changeFavoriteIconColor();
+            }
+        });
+    }
+
+    private void changeFavoriteIconColor(){
         if(isFavorite){
             mDrawable.setColorFilter(new
                     PorterDuffColorFilter(0xffF44336, PorterDuff.Mode.SRC_IN));
@@ -86,6 +114,31 @@ public class MovieDetailActivity extends AppCompatActivity {
     public void toggleFavorite(View view) {
         isFavorite = !isFavorite;
         Log.d("FAVORITE: ", "toggling favorite!" + isFavorite);
-        checkIsFavorite();
+        changeFavoriteIconColor();
+    }
+
+    // Use the on destroy activity lifecycle event to save or delete if a movie is favorited
+    @Override
+    protected void onDestroy() {
+        // super.onDestroy();
+        Log.d("DETAIL: ", "ON DESTROY!!");
+
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                if(isFavorite && !isFavoriteDB){
+                    Log.d("DB: ", "Saving movie to DB");
+                    int id = mMovie.getMovie_id();
+                    FavoriteMovie movie = new FavoriteMovie(id);
+                    Log.d("DB FAV MOVIE: ", "id = " + movie.getMovie_id() + "should be: " + id);
+                    mDb.favoriteMovieDao().insertFavoriteMovie(movie);
+                } else if(isFavoriteDB && !isFavorite) {
+                    Log.d("DB: ", "Deleting movie from DB");
+                    mDb.favoriteMovieDao().deleteFavoriteMovie(mMovie.getMovie_id());
+                }
+            }
+        });
+
+        super.onDestroy();
     }
 }

@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -14,7 +15,10 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.popularmovies.database.AppDatabase;
+import com.example.popularmovies.database.FavoriteMovie;
 import com.example.popularmovies.model.Movie;
+import com.example.popularmovies.utilities.AppExecutors;
 import com.example.popularmovies.utilities.MovieDBJsonUtils;
 import com.example.popularmovies.utilities.NetworkUtils;
 
@@ -31,6 +35,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private ProgressBar mLoadingIndicator;
 
     private List<Movie> movieData;
+
+    private AppDatabase mDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +68,26 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         // load default endopoint movie grid (most popular movies)
         loadMovies(NetworkUtils.Endpoint.POPULAR);
+
+        // database
+        mDb = AppDatabase.getInstance(this);
+
+        checkFavoriteMovies();
+    }
+
+    private void checkFavoriteMovies() {
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                List<FavoriteMovie> favoriteMovies = mDb.favoriteMovieDao().loadAllFavoriteMovies();
+                Log.d("LOADING FAVORITES: ", "size is " + favoriteMovies.size());
+
+                for(int i = 0; i < favoriteMovies.size(); i++){
+                    Log.d("FAV MOVIE: ", "id = " + favoriteMovies.get(i).getMovie_id());
+                }
+
+            }
+        });
     }
 
     /**
@@ -209,6 +235,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                     // Parse JSON into a list of movies...
                     movieData = MovieDBJsonUtils
                             .getMoviesFromJson(jsonMovieResponse);
+
+                    for(int i = 0; i < movieData.size(); i++){
+                        movieData.get(i).printMovie();
+                    }
 
                 } catch (Exception e) {
                     e.printStackTrace();

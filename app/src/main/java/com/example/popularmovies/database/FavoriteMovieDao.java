@@ -13,11 +13,14 @@ import java.util.List;
 public interface FavoriteMovieDao {
 
     @Query("SELECT * FROM favorite_movies")
-    List<Movie> loadAllFavoriteMovies();
+    List<FavoriteMovie> loadAllFavoriteMovies();
+
+    @Query("SELECT COUNT(1) FROM favorite_movies WHERE movie_id = :movie_id")
+    int isMovieFavorite(int movie_id);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertFavoriteMovie(FavoriteMovie favoriteMovie);
 
-    @Query("DELETE FROM favorite_movies WHERE id = :id")
-    void deleteFavoriteMovie(int id);
+    @Query("DELETE FROM favorite_movies WHERE movie_id = :movie_id")
+    void deleteFavoriteMovie(int movie_id);
 }
