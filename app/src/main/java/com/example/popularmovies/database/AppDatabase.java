@@ -9,7 +9,7 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
 @Database(entities =
-        { },
+        { FavoriteMovie.class },
         version = 1,
         exportSchema = false)
 
@@ -17,7 +17,7 @@ public abstract class AppDatabase extends RoomDatabase {
 
     private static final String LOG_TAG = AppDatabase.class.getSimpleName();
     private static final Object LOCK = new Object();
-    private static final String DATABASE_NAME = "labores";
+    private static final String DATABASE_NAME = "movieDB";
     private static AppDatabase sInstance;
 
     public static AppDatabase getInstance(Context context) {
