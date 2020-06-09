@@ -1,4 +1,4 @@
-# Project for Udacity Android ND Popular Movies: Stage 1
+# Project for Udacity Android ND Popular Movies: Stage 2
 
 ## How to use:
 Since this project uses The Movie DB API, user must have an API Key. This Key is not shared in this project, but it is referenced.
