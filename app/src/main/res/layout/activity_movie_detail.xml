@@ -25,6 +25,14 @@
             android:orientation="vertical"
             android:paddingLeft="15sp">
 
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:id="@+id/iv_favorite"
+                android:src="@drawable/ic_heart"
+                android:tint="@color/colorHeartGray"
+                android:onClick="toggleFavorite"/>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

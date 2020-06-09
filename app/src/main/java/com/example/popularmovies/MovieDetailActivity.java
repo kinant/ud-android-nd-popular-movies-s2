@@ -1,9 +1,15 @@
 package com.example.popularmovies;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,6 +26,10 @@ public class MovieDetailActivity extends AppCompatActivity {
     private TextView mPlot;
 
     private ImageView mPoster;
+    private ImageView mFavoriteIcon;
+    private Drawable mDrawable;
+
+    private boolean isFavorite = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +42,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         mVoterAvg = (TextView) findViewById(R.id.vote_avg_tv);
         mPlot = (TextView) findViewById(R.id.plot_tv);
         mPoster = (ImageView) findViewById(R.id.d_poster_iv);
+        mFavoriteIcon = (ImageView) findViewById(R.id.iv_favorite);
 
         // Get the movie
         Intent intent = getIntent();
@@ -51,5 +62,30 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         // set the title
         setTitle(movie.getTitle());
+
+        // check if movie is favorite
+        checkIsFavorite();
+        // https://www.semicolonworld.com/question/45887/change-drawable-color-programmatically
+        mDrawable = ContextCompat.getDrawable(this,R.drawable.ic_heart);
+    }
+
+
+
+    private void checkIsFavorite() {
+        if(isFavorite){
+            mDrawable.setColorFilter(new
+                    PorterDuffColorFilter(0xffF44336, PorterDuff.Mode.SRC_IN));
+        } else {
+            mDrawable.setColorFilter(new
+                    PorterDuffColorFilter(0xffE91E63, PorterDuff.Mode.SRC_IN));
+        }
+
+        mFavoriteIcon.setImageDrawable(mDrawable);
+    }
+
+    public void toggleFavorite(View view) {
+        isFavorite = !isFavorite;
+        Log.d("FAVORITE: ", "toggling favorite!" + isFavorite);
+        checkIsFavorite();
     }
 }
