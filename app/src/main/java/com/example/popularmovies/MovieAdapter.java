@@ -1,6 +1,8 @@
 package com.example.popularmovies;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +12,8 @@ import android.view.View.OnClickListener;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.popularmovies.model.Movie;
+import com.example.popularmovies.utilities.ImageSaver;
+import com.example.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -22,6 +26,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
     // List of movies that will be populated (set) once loaded from the API
     private List<Movie> mMovieData;
+    private Context mContext;
 
     /*
      * An on-click handler that we've defined to make it easy for an Activity to interface with
@@ -113,6 +118,15 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         Picasso.get()
                 .load(mMovieData.get(position).getPoster())
                 .into(movieAdapterViewHolder.mMoviePoster);
+
+//        Bitmap bitmap = new ImageSaver(movieAdapterViewHolder.itemView.getContext())
+//                .setDirectoryName("favorite_movies")
+//                .setFileName(mMovieData.get(position).getMovie_id() + ".png")
+//                .load();
+//
+//        if(bitmap != null) {
+//            movieAdapterViewHolder.mMoviePoster.setImageBitmap(bitmap);
+//        }
     }
 
     /**

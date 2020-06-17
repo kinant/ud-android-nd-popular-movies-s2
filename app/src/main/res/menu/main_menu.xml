@@ -11,4 +11,8 @@
         android:id="@+id/action_highest_rated"
         android:title="Highest Rated"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_favorites"
+        android:title="Favorites"
+        app:showAsAction="never" />
 </menu>

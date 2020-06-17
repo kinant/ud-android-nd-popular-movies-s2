@@ -110,6 +110,16 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         }
     }
 
+    private void loadFavoriteMovies() {
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                movieData = mDb.favoriteMovieDao().loadAllFavoriteMovies();
+                mMovieAdapter.setMovieData(movieData);
+            }
+        });
+    }
+
     /**
      * This method is used to show the grid (once movies are successfully loaded)
      */
@@ -192,6 +202,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         if(id == R.id.action_highest_rated){
             // load highest rated
             loadMovies(NetworkUtils.Endpoint.TOP_RATED);
+        }
+        if( id == R.id.action_favorites){
+            setTitle("Favorite Movies");
+            loadFavoriteMovies();
         }
 
         return super.onOptionsItemSelected(item);

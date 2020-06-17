@@ -18,12 +18,14 @@ public final class NetworkUtils {
 
     final static String most_popular = "popular";
     final static String highest_rated = "top_rated";
+    final static String favorites = "favorites";
 
     private static final String API_PARAM = "api_key";
 
     public enum Endpoint {
         POPULAR,
-        TOP_RATED
+        TOP_RATED,
+        FAVORITES;
     }
     /**
      * Builds the URL used to talk to the weather server using a location. This location is based

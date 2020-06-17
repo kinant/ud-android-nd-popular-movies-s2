@@ -111,4 +111,8 @@ public class ImageSaver {
         }
         return null;
     }
+
+    public boolean delete() {
+        return createFile().delete();
+    }
 }

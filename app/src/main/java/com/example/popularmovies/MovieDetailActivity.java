@@ -10,6 +10,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -134,30 +135,52 @@ public class MovieDetailActivity extends AppCompatActivity {
     public void toggleFavorite(View view) {
         isFavorite = !isFavorite;
         changeFavoriteIconColor();
+
+        if(isFavorite){
+            saveFavorite();
+        } else {
+            deleteFavorite();
+        }
     }
 
-    // Use the on destroy activity lifecycle event to save or delete if a movie is favorited
-    @Override
-    protected void onDestroy() {
+    private void saveFavorite(){
+        Log.d("ACT: ", "saving step 1");
+        if(isFavorite && !isFavoriteDB){
+            Log.d("ACT: ", "saving step 2");
+            if(mPosterBitmap != null) {
+                Log.d("ACT: ", "saving step 3");
+                // save image
+                new ImageSaver(getApplicationContext())
+                        .setFileName(mMovie.getMovie_id() + ".png")
+                        .setDirectoryName("favorite_movies")
+                        .save(mPosterBitmap);
+            }
+            // save move information
+            Log.d("ACT: ", "saving step 4");
+            AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    mDb.favoriteMovieDao().insertFavoriteMovie(mMovie);
+                }
+            });
+        }
+    }
 
-        AppExecutors.getInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                if(isFavorite && !isFavoriteDB){
-
-                    if(mPosterBitmap != null) {
-                        new ImageSaver(getApplicationContext())
-                                .setFileName(mMovie.getMovie_id() + ".png")
-                                .setDirectoryName("favorite_movies")
-                                .save(mPosterBitmap);
-                        mDb.favoriteMovieDao().insertFavoriteMovie(mMovie);
-                    }
-                } else if(isFavoriteDB && !isFavorite) {
+    private void deleteFavorite(){
+        if(isFavoriteDB && !isFavorite) {
+            // delete from db
+            AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
                     mDb.favoriteMovieDao().deleteFavoriteMovie(mMovie.getMovie_id());
                 }
-            }
-        });
+            });
 
-        super.onDestroy();
+            // delete file
+            new ImageSaver(getApplicationContext())
+                    .setFileName(mMovie.getMovie_id() + ".png")
+                    .setDirectoryName("favorite_movies")
+                    .delete();
+        }
     }
 }
