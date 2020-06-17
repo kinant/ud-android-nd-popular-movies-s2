@@ -119,14 +119,18 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
                 .load(mMovieData.get(position).getPoster())
                 .into(movieAdapterViewHolder.mMoviePoster);
 
-//        Bitmap bitmap = new ImageSaver(movieAdapterViewHolder.itemView.getContext())
-//                .setDirectoryName("favorite_movies")
-//                .setFileName(mMovieData.get(position).getMovie_id() + ".png")
-//                .load();
-//
-//        if(bitmap != null) {
-//            movieAdapterViewHolder.mMoviePoster.setImageBitmap(bitmap);
-//        }
+        // if movie data still exists, we have offline data
+        // available. load it. 
+        if(mMovieData.size() > 0) {
+            Bitmap bitmap = new ImageSaver(movieAdapterViewHolder.itemView.getContext())
+                    .setDirectoryName("favorite_movies")
+                    .setFileName(mMovieData.get(position).getMovie_id() + ".png")
+                    .load();
+
+            if(bitmap != null) {
+                movieAdapterViewHolder.mMoviePoster.setImageBitmap(bitmap);
+            }
+        }
     }
 
     /**

@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         // database
         mDb = AppDatabase.getInstance(this);
 
-        checkFavoriteMovies();
+        // checkFavoriteMovies();
     }
 
     private void checkFavoriteMovies() {
@@ -80,6 +80,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             public void run() {
                 List<Movie> favoriteMovies = mDb.favoriteMovieDao().loadAllFavoriteMovies();
                 Log.d("LOADING FAVORITES: ", "size is " + favoriteMovies.size());
+
+                if(favoriteMovies.size() > 0){
+                    hideErrorMessage();
+                    showGrid();
+                }
 
                 for(int i = 0; i < favoriteMovies.size(); i++){
                     Log.d("FAV MOVIE: ", "id = " + favoriteMovies.get(i).getMovie_id());
@@ -116,6 +121,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             public void run() {
                 movieData = mDb.favoriteMovieDao().loadAllFavoriteMovies();
                 mMovieAdapter.setMovieData(movieData);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        showGrid();
+                        hideErrorMessage();
+                    }
+                });
             }
         });
     }

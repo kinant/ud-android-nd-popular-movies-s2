@@ -176,6 +176,7 @@ public class MovieDetailActivity extends AppCompatActivity {
                 }
             });
 
+            Log.d("DETAIL: ", "should be attempting to delete!");
             // delete file
             new ImageSaver(getApplicationContext())
                     .setFileName(mMovie.getMovie_id() + ".png")
