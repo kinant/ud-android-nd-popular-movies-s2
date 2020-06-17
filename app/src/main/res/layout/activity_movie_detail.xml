@@ -90,6 +90,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"/>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="REVIEWS: "
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:layout_marginTop="15sp"
+                android:textSize="25sp" />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerview_reviews"
                 android:layout_width="match_parent"

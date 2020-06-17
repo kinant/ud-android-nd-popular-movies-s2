@@ -50,6 +50,8 @@ public final class NetworkUtils {
             base_url += highest_rated;
         } else if (endpoint == Endpoint.REVIEWS){
             base_url += movie_id + "/" + reviews;
+        } else if (endpoint == Endpoint.VIDEOS){
+            base_url += movie_id + "/" + videos;
         }
 
         Uri builtUri = Uri.parse(base_url).buildUpon()

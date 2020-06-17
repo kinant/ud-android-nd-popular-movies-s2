@@ -38,7 +38,7 @@ import java.net.URL;
 import java.util.List;
 
 public class MovieDetailActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<String>{
+        implements LoaderManager.LoaderCallbacks<String[]>{
 
     public static final String MOVIE = "movie";
     private static final int TMDB_API_LOADER = 22;
@@ -150,6 +150,9 @@ public class MovieDetailActivity extends AppCompatActivity
         // disable recycler view scrolling
         // https://stackoverflow.com/questions/30531091/how-to-disable-recyclerview-scrolling#:~:text=If%20you%20just%20disable%20only,not%20be%20disable%20touch%20event.&text=There%20is%20a%20realy%20simple%20answer.&text=Extend%20the%20LayoutManager%20and%20override,canScrollVertically()%20to%20disable%20scrolling.
 
+        // scrolling:
+        https://guides.codepath.com/android/handling-scrolls-with-coordinatorlayout
+
         // load reviews and videos
         requestAPIReviewsAndVideos();
     }
@@ -233,10 +236,12 @@ public class MovieDetailActivity extends AppCompatActivity
     }
 
     private void requestAPIReviewsAndVideos(){
-        URL videosQueryURL = NetworkUtils.buildURL(NetworkUtils.Endpoint.REVIEWS, getString(R.string.api_key), mMovie.getMovie_id());
+        URL reviewsQueryURL = NetworkUtils.buildURL(NetworkUtils.Endpoint.REVIEWS, getString(R.string.api_key), mMovie.getMovie_id());
+        URL videosQueryURL = NetworkUtils.buildURL(NetworkUtils.Endpoint.VIDEOS, getString(R.string.api_key), mMovie.getMovie_id());
 
         Bundle queryBundle = new Bundle();
-        queryBundle.putString("reviews_url", videosQueryURL.toString());
+        queryBundle.putString("reviews_url", reviewsQueryURL.toString());
+        queryBundle.putString("videos_url", videosQueryURL.toString());
 
         LoaderManager loaderManager = getSupportLoaderManager();
         Loader<String> reviewQueryLoader = loaderManager.getLoader(TMDB_API_LOADER);
@@ -250,8 +255,8 @@ public class MovieDetailActivity extends AppCompatActivity
 
     @NonNull
     @Override
-    public Loader<String> onCreateLoader(int id, @Nullable final Bundle args) {
-        return new AsyncTaskLoader<String>(this) {
+    public Loader<String[]> onCreateLoader(int id, @Nullable final Bundle args) {
+        return new AsyncTaskLoader<String[]>(this) {
 
             @Override
             protected void onStartLoading() {
@@ -264,14 +269,23 @@ public class MovieDetailActivity extends AppCompatActivity
 
             @Nullable
             @Override
-            public String loadInBackground() {
-                String queryURLString = args.getString("reviews_url");
+            public String[] loadInBackground() {
+                String queryReviewsURLString = args.getString("reviews_url");
+                String queryVideosURLString = args.getString("videos_url");
 
                 try {
-                    URL tmdbAPIUrl = new URL(queryURLString);
-                    String apiReviewResults = NetworkUtils.getResponseFromHttpUrl(tmdbAPIUrl);
+                    URL tmdbRAPIUrl = new URL(queryReviewsURLString);
+                    URL tmdbVAPIUrl = new URL(queryVideosURLString);
+
+                    String apiReviewResults = NetworkUtils.getResponseFromHttpUrl(tmdbRAPIUrl);
+                    String apiVideoResults = NetworkUtils.getResponseFromHttpUrl(tmdbVAPIUrl);
+
                     Log.d("REV API: ", apiReviewResults);
-                    return apiReviewResults;
+                    Log.d("VID API: ", apiVideoResults);
+
+                    String[] results = {apiReviewResults, apiVideoResults};
+
+                    return results;
                 } catch (IOException e){
                     e.printStackTrace();
                     return null;
@@ -281,12 +295,14 @@ public class MovieDetailActivity extends AppCompatActivity
     }
 
     @Override
-    public void onLoadFinished(@NonNull Loader<String> loader, String data) {
+    public void onLoadFinished(@NonNull Loader<String[]> loader, String[] data) {
         if(data == null){
             // show error
         } else {
-            Log.d("DATA: ", data);
-            mReviews = MovieDBJsonUtils.getReviewsFromJson(data);
+            Log.d("DATA 1: ", data[0]);
+            Log.d("DATA 2: ", data[1]);
+
+            mReviews = MovieDBJsonUtils.getReviewsFromJson(data[0]);
 
             mReviewAdapter.setReviewData(mReviews);
 
@@ -297,7 +313,7 @@ public class MovieDetailActivity extends AppCompatActivity
     }
 
     @Override
-    public void onLoaderReset(@NonNull Loader<String> loader) {
+    public void onLoaderReset(@NonNull Loader<String[]> loader) {
 
     }
 }
