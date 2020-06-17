@@ -1,7 +1,12 @@
 package com.example.popularmovies;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.AsyncTaskLoader;
+import androidx.loader.content.Loader;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -19,12 +24,18 @@ import com.example.popularmovies.database.AppDatabase;
 import com.example.popularmovies.model.Movie;
 import com.example.popularmovies.utilities.AppExecutors;
 import com.example.popularmovies.utilities.ImageSaver;
+import com.example.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
-public class MovieDetailActivity extends AppCompatActivity {
+import java.io.IOException;
+import java.net.URL;
+
+public class MovieDetailActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<String>{
 
     public static final String MOVIE = "movie";
+    private static final int TMDB_API_LOADER = 22;
 
     private TextView mTitle;
     private TextView mReleaseDate;
@@ -103,8 +114,14 @@ public class MovieDetailActivity extends AppCompatActivity {
         // set the title
         setTitle(mMovie.getTitle());
 
+        // initialize the loader
+        getSupportLoaderManager().initLoader(TMDB_API_LOADER, null, this);
+
         // check if movie is favorite
         checkIsFavorite();
+
+        // load reviews and videos
+        requestAPIReviewsAndVideos();
     }
 
     private void checkIsFavorite() {
@@ -183,5 +200,67 @@ public class MovieDetailActivity extends AppCompatActivity {
                     .setDirectoryName("favorite_movies")
                     .delete();
         }
+    }
+
+    private void requestAPIReviewsAndVideos(){
+        URL videosQueryURL = NetworkUtils.buildURL(NetworkUtils.Endpoint.REVIEWS, getString(R.string.api_key), mMovie.getMovie_id());
+
+        Bundle queryBundle = new Bundle();
+        queryBundle.putString("reviews_url", videosQueryURL.toString());
+
+        LoaderManager loaderManager = getSupportLoaderManager();
+        Loader<String> reviewQueryLoader = loaderManager.getLoader(TMDB_API_LOADER);
+
+        if(reviewQueryLoader == null){
+            loaderManager.initLoader(TMDB_API_LOADER, queryBundle, this);
+        } else {
+            loaderManager.restartLoader(TMDB_API_LOADER, queryBundle, this);
+        }
+    }
+
+    @NonNull
+    @Override
+    public Loader<String> onCreateLoader(int id, @Nullable final Bundle args) {
+        return new AsyncTaskLoader<String>(this) {
+
+            @Override
+            protected void onStartLoading() {
+                if(args == null){
+                    return;
+                }
+
+                forceLoad();
+            }
+
+            @Nullable
+            @Override
+            public String loadInBackground() {
+                String queryURLString = args.getString("reviews_url");
+
+                try {
+                    URL tmdbAPIUrl = new URL(queryURLString);
+                    String apiReviewResults = NetworkUtils.getResponseFromHttpUrl(tmdbAPIUrl);
+                    Log.d("REV API: ", apiReviewResults);
+                    return apiReviewResults;
+                } catch (IOException e){
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<String> loader, String data) {
+        if(data == null){
+            // show error
+        } else {
+            Log.d("DATA: ", data);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<String> loader) {
+
     }
 }

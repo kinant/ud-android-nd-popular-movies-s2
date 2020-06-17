@@ -250,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
                 // build the url
                 URL moviesRequestUrl = NetworkUtils
-                        .buildURL(endpointSelected, getString(R.string.api_key));
+                        .buildURL(endpointSelected, getString(R.string.api_key), 0);
 
                 try {
 

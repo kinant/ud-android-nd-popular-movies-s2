@@ -19,13 +19,16 @@ public final class NetworkUtils {
     final static String most_popular = "popular";
     final static String highest_rated = "top_rated";
     final static String favorites = "favorites";
+    final static String reviews = "reviews";
+    final static String videos = "videos";
 
     private static final String API_PARAM = "api_key";
 
     public enum Endpoint {
         POPULAR,
         TOP_RATED,
-        FAVORITES;
+        REVIEWS,
+        VIDEOS;
     }
     /**
      * Builds the URL used to talk to the weather server using a location. This location is based
@@ -35,7 +38,7 @@ public final class NetworkUtils {
      * @param api_key The user's api key to be used as a query parameter (to have access to the data)
      * @return The URL to use to query the API server.
      */
-    public static URL buildURL(Endpoint endpoint, String api_key){
+    public static URL buildURL(Endpoint endpoint, String api_key, int movie_id){
 
         // we will build the url from the base url
         String base_url = MOVIES_DB_URL;
@@ -45,6 +48,8 @@ public final class NetworkUtils {
             base_url += most_popular;
         } else if (endpoint == Endpoint.TOP_RATED){
             base_url += highest_rated;
+        } else if (endpoint == Endpoint.REVIEWS){
+            base_url += movie_id + "/" + reviews;
         }
 
         Uri builtUri = Uri.parse(base_url).buildUpon()
@@ -61,6 +66,7 @@ public final class NetworkUtils {
 
         return url;
     }
+
     /**
      * This method returns the entire result from the HTTP response.
      *
