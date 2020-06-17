@@ -1,8 +1,7 @@
-package com.example.popularmovies;
+package com.example.popularmovies.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,9 +10,9 @@ import android.view.View.OnClickListener;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.popularmovies.R;
 import com.example.popularmovies.model.Movie;
 import com.example.popularmovies.utilities.ImageSaver;
-import com.example.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

@@ -9,8 +9,8 @@
 
     <ImageView
         android:id="@+id/d_poster_iv"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_width="100dp"
+        android:layout_height="150dp"
         android:adjustViewBounds="true"
         android:contentDescription="@string/poster_content"
         android:scaleType="centerCrop" />
@@ -90,6 +90,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"/>
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerview_reviews"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 

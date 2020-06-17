@@ -7,6 +7,8 @@ import androidx.core.content.ContextCompat;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.AsyncTaskLoader;
 import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -20,6 +22,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.popularmovies.adapters.ReviewAdapter;
 import com.example.popularmovies.database.AppDatabase;
 import com.example.popularmovies.model.Movie;
 import com.example.popularmovies.model.Review;
@@ -48,6 +51,9 @@ public class MovieDetailActivity extends AppCompatActivity
     private ImageView mPoster;
     private ImageView mFavoriteIcon;
     private Drawable mDrawable;
+
+    private RecyclerView mRecyclerView;
+    private ReviewAdapter mReviewAdapter;
 
     private AppDatabase mDb;
 
@@ -124,6 +130,25 @@ public class MovieDetailActivity extends AppCompatActivity
 
         // check if movie is favorite
         checkIsFavorite();
+
+        // recycler view
+        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_reviews);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        layoutManager.setSmoothScrollbarEnabled(false);
+
+        mRecyclerView.setLayoutManager(layoutManager);
+
+        mRecyclerView.setHasFixedSize(true);
+
+        mRecyclerView.setLayoutFrozen(true);
+
+        mReviewAdapter = new ReviewAdapter();
+
+        mRecyclerView.setAdapter(mReviewAdapter);
+
+        // disable recycler view scrolling
+        // https://stackoverflow.com/questions/30531091/how-to-disable-recyclerview-scrolling#:~:text=If%20you%20just%20disable%20only,not%20be%20disable%20touch%20event.&text=There%20is%20a%20realy%20simple%20answer.&text=Extend%20the%20LayoutManager%20and%20override,canScrollVertically()%20to%20disable%20scrolling.
 
         // load reviews and videos
         requestAPIReviewsAndVideos();
@@ -262,6 +287,8 @@ public class MovieDetailActivity extends AppCompatActivity
         } else {
             Log.d("DATA: ", data);
             mReviews = MovieDBJsonUtils.getReviewsFromJson(data);
+
+            mReviewAdapter.setReviewData(mReviews);
 
             for(int i = 0; i < mReviews.size(); i++){
                 Log.d("REVIEW " + i + ": ", mReviews.get(i).getAuthor() + " - " + mReviews.get(i).getContent());
