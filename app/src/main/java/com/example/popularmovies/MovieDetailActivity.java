@@ -19,6 +19,7 @@ import com.example.popularmovies.model.Movie;
 import com.example.popularmovies.utilities.AppExecutors;
 import com.example.popularmovies.utilities.ImageSaver;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 public class MovieDetailActivity extends AppCompatActivity {
 
@@ -36,6 +37,10 @@ public class MovieDetailActivity extends AppCompatActivity {
     private AppDatabase mDb;
 
     private Movie mMovie;
+
+    // for bitmap saving
+    private Target mTarget;
+    private Bitmap mPosterBitmap;
 
     private boolean isFavorite = false;
     private boolean isFavoriteDB = false;
@@ -63,9 +68,27 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         // Set the image using Picasso
         // https://guides.codepath.com/android/Displaying-Images-with-the-Picasso-Library
+        mTarget = new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                mPoster.setImageBitmap(bitmap);
+                mPosterBitmap = bitmap;
+            }
+
+            @Override
+            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        };
+
         Picasso.get()
                 .load(mMovie.getPoster())
-                .into(mPoster);
+                .into(mTarget);
 
         // Set the text views
         mTitle.setText(mMovie.getTitle());
@@ -122,14 +145,13 @@ public class MovieDetailActivity extends AppCompatActivity {
             public void run() {
                 if(isFavorite && !isFavoriteDB){
 
-                    Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.id.d_poster_iv);
-
-                    new ImageSaver(getApplicationContext())
-                            .setFileName(mMovie.getMovie_id() + ".png")
-                            .setDirectoryName("favorite_movies")
-                            .save(bitmap);
-
-                    mDb.favoriteMovieDao().insertFavoriteMovie(mMovie);
+                    if(mPosterBitmap != null) {
+                        new ImageSaver(getApplicationContext())
+                                .setFileName(mMovie.getMovie_id() + ".png")
+                                .setDirectoryName("favorite_movies")
+                                .save(mPosterBitmap);
+                        mDb.favoriteMovieDao().insertFavoriteMovie(mMovie);
+                    }
                 } else if(isFavoriteDB && !isFavorite) {
                     mDb.favoriteMovieDao().deleteFavoriteMovie(mMovie.getMovie_id());
                 }
