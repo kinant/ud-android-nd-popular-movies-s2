@@ -1,11 +1,13 @@
 package com.example.popularmovies.utilities;
 
 import com.example.popularmovies.model.Movie;
+import com.example.popularmovies.model.Review;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +20,8 @@ public final class MovieDBJsonUtils {
     final static String MDB_POSTER = "poster_path";
     final static String MDB_VOTE_AVG = "vote_average";
     final static String MDB_PLOT = "overview";
+    final static String MDB_REVIEW_AUTH = "author";
+    final static String MDB_REVIEW_CONTENT = "content";
 
     /** This method is used to convert a string from a JSONObject
      * into a list of movies
@@ -67,5 +71,36 @@ public final class MovieDBJsonUtils {
         }
 
         return movies;
+    }
+
+    public static List<Review> getReviewsFromJson(String jsonString){
+
+        List<Review> reviews = new ArrayList<>();
+
+        try {
+            // get the entire response
+            JSONObject response = new JSONObject(jsonString);
+
+            // reviews are contained in the "results" array
+            JSONArray results = response.getJSONArray(MDB_RESULTS);
+
+            // iterate over results to get the reviews
+            for(int i = 0; i < results.length(); i++){
+                JSONObject result = results.getJSONObject(i);
+
+                // get the data
+                String author = result.getString(MDB_REVIEW_AUTH);
+                String content = result.getString(MDB_REVIEW_CONTENT);
+
+                // create a new review
+                Review review = new Review(author, content);
+
+                reviews.add(review);
+            }
+        } catch(JSONException e){
+            e.printStackTrace();
+        }
+
+        return reviews;
     }
 }

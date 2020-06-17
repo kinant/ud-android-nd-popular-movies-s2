@@ -22,14 +22,17 @@ import android.widget.TextView;
 
 import com.example.popularmovies.database.AppDatabase;
 import com.example.popularmovies.model.Movie;
+import com.example.popularmovies.model.Review;
 import com.example.popularmovies.utilities.AppExecutors;
 import com.example.popularmovies.utilities.ImageSaver;
+import com.example.popularmovies.utilities.MovieDBJsonUtils;
 import com.example.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 
 public class MovieDetailActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<String>{
@@ -49,6 +52,8 @@ public class MovieDetailActivity extends AppCompatActivity
     private AppDatabase mDb;
 
     private Movie mMovie;
+
+    private List<Review> mReviews;
 
     // for bitmap saving
     private Target mTarget;
@@ -256,6 +261,11 @@ public class MovieDetailActivity extends AppCompatActivity
             // show error
         } else {
             Log.d("DATA: ", data);
+            mReviews = MovieDBJsonUtils.getReviewsFromJson(data);
+
+            for(int i = 0; i < mReviews.size(); i++){
+                Log.d("REVIEW " + i + ": ", mReviews.get(i).getAuthor() + " - " + mReviews.get(i).getContent());
+            }
         }
     }
 
